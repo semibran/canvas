@@ -1,7 +1,7 @@
 {
   "name": "canvas",
   "version": "0.0.1",
-  "description": "Wrapper for HTML Canvas API with a focus on usability",
+  "description": "High-level interface for rendering graphics in the browser",
   "author": "Brandon Semilla (https://github.com/semibran)",
   "repository": {
     "type": "git",
@@ -9,7 +9,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "budo index.js --open --live  --host localhost --port 3000"
+    "start": "budo test.js --open --live  --host localhost --port 8080"
   },
   "devDependencies": {
     "budo": "^9.3.0"
