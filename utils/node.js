@@ -1,8 +1,10 @@
+const Canvas = require('./canvas')
 const { directions, createContext, getImage, getBounds } = require('./utils')
 
-module.exports = { create }
+module.exports = function create(options) {
 
-function create(options) {
+  if (!options)
+    return null
 
   let { origin = 'top left', x = 0, y = 0, width = 0, height = 0, fill = 'transparent' } = options
 
@@ -12,57 +14,86 @@ function create(options) {
     if (image)
       width = image.width, height = image.height
 
-  let context = createContext(width, height)
+  let canvas = Canvas(width, height)
 
+  let drawn    = false
+  let removed  = []
   let children = new Map
-  if (options.children)
-    for (let child of options.children)
-      children.set(child, null)
 
-  let node = {}
-
-  Object.assign(node, options, {
-    origin, x, y, width, height, fill, context,
-    add, render
+  let node = Object.assign({}, options, {
+    origin, x, y, width, height, fill,
+    canvas,
+    add, remove, has, render
   })
 
-  render()
+  renderNode(canvas, node)
 
   return node
 
   function add(...nodes) {
     for (let child of nodes) {
-      let rect = drawNode(context, child)
-      children.set(child, rect)
+      if (children.has(child))
+        throw new TypeError('Failed to add child to node: target is already a child')
+      children.set(child, null)
     }
+    return node
   }
 
-  function render() {
-
-    if (!children.size) {
-      renderNode(context, node)
-      return node
+  function remove(...nodes) {
+    for (let child of nodes) {
+      if (!children.has(child))
+        throw new TypeError('Failed to remove child from node: target is not a child')
+      removed.push(child)
     }
+    return node
+  }
 
-    let damage = getDamage(children)
+  function has(...nodes) {
+    for (let child of nodes)
+      if (!children.has(child))
+        return false
+    return true
+  }
+
+  function render(...force) {
+
+    if (!force)
+      force = []
+
+    force = removed.concat(force)
+
+    if (drawn && !children.size)
+      return node
+
+    let damage
+    if (!drawn) {
+      drawn = true
+      damage = [0, 0, node.width, node.height]
+    } else
+      damage = getDamage(children, force)
 
     if (!damage)
       return node
 
-    let overlay = createContext(node.width, node.height)
-    overlay.rect(...damage)
-    overlay.clip()
+    let overlay = Canvas(node.width, node.height)
+    overlay.mask(...damage)
 
     if (node.fill !== 'transparent')
       renderNode(overlay, node)
     else
-      context.clearRect(...damage)
+      canvas.clear(...damage)
     for (let [child] of children) {
+      if (removed.includes(child)) {
+        children.delete(child)
+        continue
+      }
       let rect = drawNode(overlay, child)
       children.set(child, rect)
     }
 
-    context.drawImage(overlay.canvas, 0, 0)
+    canvas.image(overlay.element)()
+
+    removed.length = 0
 
     return node
 
@@ -80,15 +111,18 @@ function getRect(node) {
   return [x, y, width, height]
 }
 
-function getDamaged(children) {
-  return [...children]
+function getDamaged(children, force) {
+  let damaged = [...children]
     .filter(([child, rect]) => !rect || getRect(child).find((value, index) => value !== rect[index]) !== undefined)
     .map(([child, rect]) => child)
+  if (force && force.length)
+    damaged.push(...force)
+  return damaged
 }
 
-function getDamage(children) {
+function getDamage(children, force) {
 
-  let damaged = getDamaged(children)
+  let damaged = getDamaged(children, force)
   if (!damaged.length)
     return null
 
@@ -106,21 +140,19 @@ function getDamage(children) {
 
 }
 
-function renderNode(context, node) {
+function renderNode(canvas, node) {
   let { width, height, fill } = node
   let rect = [0, 0, width, height]
   let image = getImage(fill)
-  if (image) {
-    context.drawImage(image, ...rect)
-  } else if (fill !== 'transparent') {
-    context.fillStyle = node.fill
-    context.fillRect(...rect)
-  }
+  if (image)
+    canvas.image(image)(...rect)
+  else if (fill !== 'transparent')
+    canvas.rect(fill)(...rect)
 }
 
-function drawNode(context, node, rect) {
+function drawNode(canvas, node, rect) {
   if (!rect)
     rect = getRect(node)
-  context.drawImage(node.context.canvas, ...rect)
+  canvas.image(node.canvas.element)(...rect)
   return rect
 }

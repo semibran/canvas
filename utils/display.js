@@ -1,11 +1,12 @@
 const Node = require('./node')
 
-module.exports = { create, createNode }
+module.exports = Display
+Display.Node = createNode
 
-function create(width, height) {
-  return Node.create({ width, height })
+function Display(width, height) {
+  return Node({ width, height })
 }
 
 function createNode(options) {
-  return Node.create(options)
+  return Node(options)
 }
