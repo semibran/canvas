@@ -12,19 +12,11 @@ const directions = {
 
 module.exports = {
   directions,
-  createContext, getImage, getBounds
+  isImage, getBounds
 }
 
-function createContext(width, height) {
-  let canvas = document.createElement('canvas')
-  let context = canvas.getContext('2d')
-  canvas.width = width
-  canvas.height = height
-  return context
-}
-
-function getImage(value) {
-  return value instanceof window.HTMLImageElement || value instanceof window.HTMLCanvasElement ? value : null
+function isImage(value) {
+  return value && (value instanceof window.HTMLImageElement || value instanceof window.HTMLCanvasElement)
 }
 
 function getBounds(...rects) {

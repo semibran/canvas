@@ -1,14 +1,19 @@
 const Canvas = require('./canvas')
-const { directions, createContext, getImage, getBounds } = require('./utils')
+const { directions, isImage, getBounds } = require('./utils')
 
 module.exports = function create(options) {
 
   if (!options)
     return null
 
-  let { origin = 'top left', x = 0, y = 0, width = 0, height = 0, fill = 'transparent' } = options
+  let image = null
+  if (isImage(options))
+    image = options
 
-  let image = getImage(fill)
+  let { origin = 'top left', x = 0, y = 0, width = 0, height = 0, fill = image || 'transparent' } = options
+
+  if (isImage(fill))
+    image = fill
 
   if (!width || !height)
     if (image)
@@ -143,7 +148,7 @@ function getDamage(children, force) {
 function renderNode(canvas, node) {
   let { width, height, fill } = node
   let rect = [0, 0, width, height]
-  let image = getImage(fill)
+  let image = isImage(fill) ? fill : null
   if (image)
     canvas.image(image)(...rect)
   else if (fill !== 'transparent')
