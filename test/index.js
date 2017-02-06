@@ -1,4 +1,4 @@
-var Canvas = require('../lib')
+var Canvas = require('..')
 
 var canvas = Canvas(256, 224)
   .rect('black')()

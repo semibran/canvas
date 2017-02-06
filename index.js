@@ -1,4 +1,4 @@
-var Pixels = require('./pixels')
+var Pixels = require('pixels')
 
 module.exports = function Canvas(width, height) {
 
@@ -28,7 +28,7 @@ module.exports = function Canvas(width, height) {
   return canvas
 
   function rect(fill) {
-    return function drawRect(x, y, width, height) {
+    return function draw(x, y, width, height) {
       if (!x && !y)
         x = 0, y = 0
       if (!width && !height)
@@ -40,7 +40,7 @@ module.exports = function Canvas(width, height) {
   }
 
   function circle(fill) {
-    return function drawCircle(x, y, radius) {
+    return function draw(x, y, radius) {
       context.fillStyle = fill
       context.beginPath()
       context.arc(x, y, radius, 0, 2 * Math.PI)
@@ -50,7 +50,7 @@ module.exports = function Canvas(width, height) {
   }
 
   function image(image) {
-    return function drawImage(x, y, width, height) {
+    return function draw(x, y, width, height) {
       if (!x)
         x = 0
       if (!y)
@@ -75,5 +75,4 @@ module.exports = function Canvas(width, height) {
     context.putImageData(imageData, 0, 0)
     return canvas
   }
-
 }
