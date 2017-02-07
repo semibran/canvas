@@ -39,6 +39,14 @@ canvas.rect(fill)(x, y, width, height) // -> canvas
 ```
 Draws a rectangle of the given color and dimensions onto the canvas context.
 
+#### `clear`
+```javascript
+canvas.clear(x, y, width, height) // -> canvas
+```
+Clears the specified `[x, y, width, height]` region off of the canvas context.
+
+If no region is provided, the entire canvas will be cleared.
+
 #### `circle`
 ```javascript
 canvas.circle(fill)(x, y, radius) // -> canvas

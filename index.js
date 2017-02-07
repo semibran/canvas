@@ -21,7 +21,7 @@ module.exports = function Canvas(width, height) {
     element: element,
     context: context,
     width: width, height: height,
-    rect: rect, circle: circle, image: image,
+    rect: rect, clear: clear, circle: circle, image: image,
     getPixels: getPixels, setPixels: setPixels
   }
 
@@ -38,6 +38,17 @@ module.exports = function Canvas(width, height) {
       return canvas
     }
   }
+
+	function clear(x, y, width, height) {
+		if (isNaN(x) && isNaN(y) && isNaN(width) && isNaN(height)) {
+			x = 0
+			y = 0
+			width  = element.width
+			height = element.height
+		}
+		context.clearRect(x, y, width, height)
+		return canvas
+	}
 
   function circle(fill) {
     return function draw(x, y, radius) {

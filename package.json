@@ -1,6 +1,6 @@
 {
   "name": "canvas",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Usable wrapper for HTML Canvas API",
   "license": "MIT",
   "author": "Brandon Semilla <semibran@gmail.com>",
